@@ -14,6 +14,6 @@ User stories:
 - marketing copy
 
 Engineering Tasks:
-- continuous integration
+* continuous integration
 - server-side testing
 - client-side testing
