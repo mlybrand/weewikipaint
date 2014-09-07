@@ -12,6 +12,7 @@ being developed by the series.
 WeeWikiPaint
 
 To build on Windows:
+- Install node
 - Install Git
 - Clone repository
 
