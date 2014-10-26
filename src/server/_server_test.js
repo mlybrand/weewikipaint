@@ -2,6 +2,7 @@
 
 var server = require("./server.js");
 var http = require("http");
+var fs = require("fs");
 
 exports.test_serverReturnsHelloWorld = function(test) {
     server.start(8080);
@@ -25,8 +26,11 @@ exports.test_serverReturnsHelloWorld = function(test) {
 };
 
 exports.test_serverServesAFile = function(test) {
+    var testDir = "generated/test";
+    var testFile = testDir + "/test.html";
+    fs.writeFileSync(testFile, "Hello world");
+
     test.done();
-    //TODO
 };
 
 exports.test_serverRequiresPortNumber = function(test) {

@@ -1,14 +1,22 @@
-/*global desc, task, jake, fail, complete */
+/*global desc, task, jake, fail, complete, directory */
 (function() {
     "use strict";
 
     var NODE_VERSION = "v0.8.6";
+    var TEMP_TESTFILE_DIR = "generated/test";
+
+    directory(TEMP_TESTFILE_DIR);
+
+    desc("Delete all generated files");
+    task("clean", [], function() {
+        jake.rmRf("generated");
+    });
 
     desc("Build and test");
     task("default", ["lint", "test"]);
 
     desc("Lint everything");
-    task("lint", ["nodeVersion"], function() {
+    task("lint", ["nodeVersion", TEMP_TESTFILE_DIR], function() {
         var lint = require("./build/lint/lint_runner.js");
 
         var files = new jake.FileList();
