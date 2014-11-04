@@ -8,12 +8,12 @@ Minimum Marketing Feature:
 - more collaborative features
 
 User stories:
-* Do we want a custom 404 page
 - Marketing copy
-- Publish to Internet
+* Publish to Internet
 
 Engineering Tasks:
-- 
+- Write end-to-end integration test
+- Write the server launch code
 
 To Do on current task:
 
