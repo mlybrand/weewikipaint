@@ -1,17 +1,20 @@
 WeeWikiPaint
 
 Minimum Marketing Feature:
-* marketing home page
-- collaborative painting page
+* single-user painting on home page
+- collaborative painting
 - wiki-fy the pages
 - more complex painting
 - more collaborative features
 
 User stories:
-> Marketing copy
-* Publish to Internet
+* Create empty drawing area
+- Draw one line
 
 Engineering Tasks:
+* Set up client-side testing
+- Test drawing tool (Raphael?)
+- Integrate into HTML page
 
 To Do on current task:
 
@@ -23,6 +26,7 @@ Future ideas:
 - server.stop() waits for open connections to close (e.g., Firefox keeps open connection).
   Make it forcibly close?
 - Remove Node version duplication between package.json and Jakefile.js
+- Fix httpGet duplication
 
 Notes:
 - Nodeunit doesn't work properly on Windows.
