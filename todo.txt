@@ -17,6 +17,10 @@ Engineering Tasks:
 - Integrate into HTML page
 
 To Do on current task:
+- automation
+- Automatically check that we are testing against all supported browsers.
+- Move karma.conf.js to a better location
+- Unify our test file location configuration (it's currently split between Jakefile & karma.conf.js)
 
 Future ideas:
 - Create 'fail fast' assertion code

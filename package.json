@@ -4,5 +4,9 @@
   "engines": {
     "node": "*",
     "npm": "*"
+  },
+  "devDependencies": {
+    "karma-mocha": "^0.1.9",
+    "mocha": "^2.0.1"
   }
 }
