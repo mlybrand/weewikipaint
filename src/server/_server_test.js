@@ -8,6 +8,8 @@
 
     var TEST_HOME_PAGE = "generated/test/testHome.html";
     var TEST_404_PAGE = "generated/test/test404.html";
+    var PORT = 5020;
+    var BASE_URL = "http://localhost:" + PORT;
 
     exports.tearDown = function(done) {
         cleanUpFile(TEST_HOME_PAGE);
@@ -19,7 +21,7 @@
         var expectedData = "This is the home page file";
         fs.writeFileSync(TEST_HOME_PAGE, expectedData);
 
-        httpGet("http://localhost:8080", function(response, responseData) {
+        httpGet(BASE_URL, function(response, responseData) {
             test.equals(200, response.statusCode, "status code");
             test.equals(expectedData, responseData, "response text");
             test.done();
@@ -30,7 +32,7 @@
         var expectedData = "This is the 404 page file";
         fs.writeFileSync(TEST_404_PAGE, expectedData);
 
-        httpGet("http://localhost:8080/bargle", function (response, responseData) {
+        httpGet(BASE_URL + "/bargle", function (response, responseData) {
             test.equals(404, response.statusCode, "status code");
             test.equals(expectedData, responseData, "404 text");
             test.done();
@@ -40,7 +42,7 @@
     exports.test_returnsHomePageWhenAskedForIndex = function(test) {
         fs.writeFileSync(TEST_HOME_PAGE, "foo");
 
-        httpGet("http://localhost:8080/index.html", function(response, responseData) {
+        httpGet(BASE_URL + "/index.html", function(response, responseData) {
             test.equals(200, response.statusCode, "status code");
             test.done();
         });
@@ -68,7 +70,7 @@
     };
 
     exports.test_runsCallbackWhenStopCompletes = function(test) {
-        server.start(TEST_HOME_PAGE, TEST_404_PAGE, 8080);
+        server.start(TEST_HOME_PAGE, TEST_404_PAGE, PORT);
         server.stop(function() {
             test.done();
         });
@@ -82,7 +84,7 @@
     };
 
     function httpGet(url, callback) {
-        server.start(TEST_HOME_PAGE, TEST_404_PAGE, 8080, function() {
+        server.start(TEST_HOME_PAGE, TEST_404_PAGE, PORT, function() {
             var request = http.get(url);
             request.on("response", function(response) {
                 var receivedData = "";

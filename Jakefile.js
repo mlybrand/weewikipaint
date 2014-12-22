@@ -23,22 +23,31 @@
         var javascriptFiles = new jake.FileList();
         javascriptFiles.include("**/*.js");
         javascriptFiles.exclude("node_modules");
+        javascriptFiles.exclude("karma.conf.js");
         var passed = lint.validateFileList(javascriptFiles.toArray(), nodeLintOptions(), {});
         if (!passed) fail("Lint failed");
     });
 
     desc("Test everything");
-    task("test", ["nodeVersion"], function() {
+    task("test", ["testServer", "testClient"]);
+
+    desc("Test server code");
+    task("testServer", ["nodeVersion"], function() {
         var testFiles = new jake.FileList();
         testFiles.include("**/_*_test.js");
         testFiles.exclude("node_modules");
-        testFiles.exclude("/src/client/**");
+        testFiles.exclude("src/client/**");
 
         var reporter = require("nodeunit").reporters["default"];
         reporter.run(testFiles.toArray(), null, function(failures) {
             if (failures) fail("Tests failed");
             complete();
         });
+    }, {async: true});
+
+    desc("Test client code");
+    task("testClient", function() {
+       sh("node node_modules/.bin/karma run", "Client tests failed", complete);
     }, {async: true});
 
     desc("Deploy to Heroku");
@@ -93,6 +102,24 @@
         var minor = parseInt(versionInfo[2], 10);
         var bugfix = parseInt(versionInfo[3], 10);
         return [major, minor, bugfix];
+    }
+
+    function sh(command, errorMessage, callback) {
+        console.log("> " + command);
+
+        var stdout = "";
+        var process = jake.createExec(command, {printStdout: true, printStderr: true});
+        process.on("stdout", function(chunk) {
+            stdout += chunk;
+        });
+        process.on("error", function() {
+            fail(errorMessage);
+        });
+        process.on("cmdEnd", function() {
+            console.log();
+            callback();
+        });
+        process.run();
     }
 
     function nodeLintOptions() {

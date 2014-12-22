@@ -1,11 +1,18 @@
-//var assert = chai.assert;
+/*global describe, it, expect */
 
-describe("Nothing", function() {
+(function() {
+    "use strict";
 
-    it("should run", function() {
-        //assert.equal("foo", "foo");
-        //"foo".should.equal("foo");
-        expect("foo").to.equal("foo");
+    //var assert = chai.assert;
+
+    describe("Nothing", function() {
+
+        it("should run", function() {
+            //assert.equal("foo", "foo");
+            //"foo".should.equal("foo");
+            expect("foo").to.equal("bar");
+        });
+
     });
+}());
 
-});
