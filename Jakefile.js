@@ -1,15 +1,29 @@
 /*global desc, task, jake, fail, complete, directory */
-(function() {
+
+(function () {
     "use strict";
 
+    var lint = require("./build/lint/lint_runner.js");
+    var nodeunit = require("nodeunit").reporters["default"];
+
     var NODE_VERSION = "v0.8.6";
+    var SUPPORTED_BROWSERS = [
+        "IE 8.0.0 (Windows XP)",
+        "IE 9.0.0 (Windows 7)",
+        "Firefox 34.0.0 (Ubuntu)",
+        "Chromium 39.0.2171 (Ubuntu)",
+        "Chrome 39.0.2171 (Linux)",
+        "Safari 5.1.7 (Windows 7)",
+        "Opera 26.0.1656 (Linux)"
+    ];
+
     var GENERATED_DIR = "generated";
     var TEMP_TESTFILE_DIR = GENERATED_DIR + "/test";
 
     directory(TEMP_TESTFILE_DIR);
 
     desc("Delete all generated files");
-    task("clean", [], function() {
+    task("clean", [], function () {
         jake.rmRf(GENERATED_DIR);
     });
 
@@ -17,48 +31,57 @@
     task("default", ["lint", "test"]);
 
     desc("Lint everything");
-    task("lint", ["nodeVersion", TEMP_TESTFILE_DIR], function() {
-        var lint = require("./build/lint/lint_runner.js");
+    task("lint", ["lintNode", "lintClient"]);
 
-        var javascriptFiles = new jake.FileList();
-        javascriptFiles.include("**/*.js");
-        javascriptFiles.exclude("node_modules");
-        javascriptFiles.exclude("karma.conf.js");
-        var passed = lint.validateFileList(javascriptFiles.toArray(), nodeLintOptions(), {});
+    task("lintNode", ["nodeVersion", TEMP_TESTFILE_DIR], function () {
+        var passed = lint.validateFileList(nodeFiles(), nodeLintOptions(), {});
+        if (!passed) fail("Lint failed");
+    });
+
+    task("lintClient", function () {
+        var passed = lint.validateFileList(clientFiles(), browserLintOptions(), {});
         if (!passed) fail("Lint failed");
     });
 
     desc("Test everything");
-    task("test", ["testServer", "testClient"]);
+    task("test", ["testNode", "testClient"]);
 
     desc("Test server code");
-    task("testServer", ["nodeVersion"], function() {
-        var testFiles = new jake.FileList();
-        testFiles.include("**/_*_test.js");
-        testFiles.exclude("node_modules");
-        testFiles.exclude("src/client/**");
-
-        var reporter = require("nodeunit").reporters["default"];
-        reporter.run(testFiles.toArray(), null, function(failures) {
+    task("testNode", ["nodeVersion"], function () {
+        nodeunit.run(nodeTestFiles(), null, function (failures) {
             if (failures) fail("Tests failed");
             complete();
         });
     }, {async: true});
 
     desc("Test client code");
-    task("testClient", function() {
-       sh("node node_modules/.bin/karma run", "Client tests failed", complete);
+    task("testClient", function () {
+        sh("node node_modules/.bin/karma run", "Client tests failed", function (output) {
+            SUPPORTED_BROWSERS.forEach(function (browser) {
+                assertBrowserIsTested(browser, output);
+            });
+        });
     }, {async: true});
 
+    function assertBrowserIsTested(browserName, output) {
+        var searchString = browserName + ": Executed";
+        var found = output.indexOf(searchString) !== -1;
+        if (!found) {
+            fail(browserName + " was not tested!");
+        } else {
+            console.log("Confirmed " + browserName);
+        }
+    }
+
     desc("Deploy to Heroku");
-    task("deploy", ["default"], function() {
+    task("deploy", ["default"], function () {
         console.log("1. Make sure 'git status' is clean.");
         console.log("2. 'git push heroku master'");
         console.log("3. 'jake test'");
     });
 
     desc("Integrate");
-    task("integrate", ["default"], function() {
+    task("integrate", ["default"], function () {
         console.log("1. Make sure 'git status' is clean.");
         console.log("2. Build on the integration box.");
         console.log("   a. Walk over to integration box.");
@@ -71,10 +94,10 @@
     });
 
     //desc("Ensure correct version of Node is present");
-    task("nodeVersion", [], function() {
+    task("nodeVersion", [], function () {
         function failWithQualifier(qualifier) {
             fail("Incorrect node version. Expected " + qualifier +
-                    " [" + expectedString + "], but was [" + actualString + "].");
+            " [" + expectedString + "], but was [" + actualString + "].");
         }
 
         var expectedString = NODE_VERSION;
@@ -109,21 +132,56 @@
 
         var stdout = "";
         var process = jake.createExec(command, {printStdout: true, printStderr: true});
-        process.on("stdout", function(chunk) {
+        process.on("stdout", function (chunk) {
             stdout += chunk;
         });
-        process.on("error", function() {
+        process.on("error", function () {
             fail(errorMessage);
         });
-        process.on("cmdEnd", function() {
-            console.log();
-            callback();
+        process.on("cmdEnd", function () {
+            console.log(stdout);
+            callback(stdout);
         });
         process.run();
     }
 
+    function nodeFiles() {
+        var javascriptFiles = new jake.FileList();
+        javascriptFiles.include("**/*.js");
+        javascriptFiles.exclude("node_modules");
+        javascriptFiles.exclude("karma.conf.js");
+        javascriptFiles.exclude("src/client");
+        return javascriptFiles.toArray();
+    }
+
+    function nodeTestFiles() {
+        var testFiles = new jake.FileList();
+        testFiles.include("**/_*_test.js");
+        testFiles.exclude("node_modules");
+        testFiles.exclude("src/client/**");
+        return testFiles.toArray();
+    }
+
+    function clientFiles() {
+        var javascriptFiles = new jake.FileList();
+        javascriptFiles.include("src/client/**/*.js");
+        return javascriptFiles.toArray();
+    }
+
     function nodeLintOptions() {
-        return {
+        var options = globalLintOptions();
+        options.node = true;
+        return options;
+    }
+
+    function browserLintOptions() {
+        var options = globalLintOptions();
+        options.browser = true;
+        return options;
+    }
+
+    function globalLintOptions() {
+        var options = {
             bitwise: true,
             curly: false,
             eqeqeq: true,
@@ -137,8 +195,9 @@
             regexp: true,
             undef: true,
             strict: true,
-            trailing: true,
-            node: true
+            trailing: true
         };
+        return options;
     }
+
 }());
