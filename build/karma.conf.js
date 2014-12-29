@@ -5,7 +5,7 @@ module.exports = function(config) {
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
-    basePath: '.',
+    basePath: '../',
 
 
     // frameworks to use
@@ -15,11 +15,8 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-        //"node_modules/chai/chai.js",
-        //"node_modules/should/lib/should.js",
-        //"node_modules/expect/modules/expect.js",
         "node_modules/expect.js/index.js",
-        "src/client/_*_test.js"
+        "src/client/*.js"
     ],
 
 

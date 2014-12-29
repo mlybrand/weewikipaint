@@ -30,6 +30,11 @@
     desc("Build and test");
     task("default", ["lint", "test"]);
 
+    desc("Start Karma server for testing");
+    task("karma", function() {
+        sh("node node_modules/.bin/karma start build/karma.conf.js", "Could not start Karma server", complete);
+    }, {async: true});
+
     desc("Lint everything");
     task("lint", ["lintNode", "lintClient"]);
 
@@ -56,10 +61,13 @@
 
     desc("Test client code");
     task("testClient", function () {
-        sh("node node_modules/.bin/karma run", "Client tests failed", function (output) {
+        sh("node node_modules/.bin/karma run build/karma.conf.js", "Client tests failed", function (output) {
             SUPPORTED_BROWSERS.forEach(function (browser) {
                 assertBrowserIsTested(browser, output);
             });
+            if(output.indexOf("TOTAL: 0 SUCCESS") !== -1) {
+                fail("Client tests did not run!");
+            }
         });
     }, {async: true});
 
@@ -134,6 +142,7 @@
         var process = jake.createExec(command, {printStdout: true, printStderr: true});
         process.on("stdout", function (chunk) {
             stdout += chunk;
+            //console.log(stdout);
         });
         process.on("error", function () {
             fail(errorMessage);

@@ -17,7 +17,6 @@ Engineering Tasks:
 - Integrate into HTML page
 
 To Do on current task:
-- Move karma.conf.js to a better location
 - Unify our test file location configuration (it's currently split between Jakefile & karma.conf.js)
 
 Future ideas:
@@ -29,6 +28,8 @@ Future ideas:
   Make it forcibly close?
 - Remove Node version duplication between package.json and Jakefile.js
 - Fix httpGet duplication
+- Automate npm rebuild (Remove node_modules .bin directory from repository (and add to .gitignore) and 'npm rebuild' in jake
+- Ensure that every browser has same number of tests running
 
 Notes:
 - Nodeunit doesn't work properly on Windows.
