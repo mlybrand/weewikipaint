@@ -10,7 +10,7 @@
     var SUPPORTED_BROWSERS = [
         "IE 8.0.0 (Windows XP)",
         "IE 9.0.0 (Windows 7)",
-        "Firefox 34.0.0 (Ubuntu)",
+        "Firefox 35.0.0 (Ubuntu)",
         "Chromium 39.0.2171 (Ubuntu)",
         "Chrome 39.0.2171 (Linux)",
         "Safari 5.1.7 (Windows 7)",
@@ -62,14 +62,24 @@
     desc("Test client code");
     task("testClient", function () {
         sh("node node_modules/.bin/karma run build/karma.conf.js", "Client tests failed", function (output) {
+            var browserMissing = false;
             SUPPORTED_BROWSERS.forEach(function (browser) {
-                assertBrowserIsTested(browser, output);
+                browserMissing = checkIfBrowserTested(browser, output) || browserMissing;
+                //assertBrowserIsTested(browser, output);
             });
+            if (browserMissing && !process.env.loose) fail("Did not test all supported browsers (use 'loose=true' to suppress");
+
             if(output.indexOf("TOTAL: 0 SUCCESS") !== -1) {
                 fail("Client tests did not run!");
             }
         });
     }, {async: true});
+
+    function checkIfBrowserTested(browser, output) {
+        var missing = output.indexOf(browser + ": Executed") === -1;
+        if (missing) console.log(browser + " was not tested!");
+        return missing;
+    }
 
     function assertBrowserIsTested(browserName, output) {
         var searchString = browserName + ": Executed";

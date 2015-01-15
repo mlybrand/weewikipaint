@@ -24,6 +24,9 @@
     };
 
     exports.stop = function(callback) {
+        if (server._handle === null) {
+            throw "Server not started";
+        }
         server.close(callback);
     };
 
