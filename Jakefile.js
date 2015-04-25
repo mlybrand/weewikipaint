@@ -12,7 +12,7 @@
         "IE 9.0.0 (Windows 7)",
         "Firefox 35.0.0 (Ubuntu)",
         "Chromium 39.0.2171 (Ubuntu)",
-        "Chrome 39.0.2171 (Linux)",
+        "Chrome 42.0.2311 (Linux)",
         "Safari 5.1.7 (Windows 7)",
         "Opera 26.0.1656 (Linux)"
     ];
@@ -67,6 +67,7 @@
                 browserMissing = checkIfBrowserTested(browser, output) || browserMissing;
                 //assertBrowserIsTested(browser, output);
             });
+
             if (browserMissing && !process.env.loose) fail("Did not test all supported browsers (use 'loose=true' to suppress");
 
             if(output.indexOf("TOTAL: 0 SUCCESS") !== -1) {
@@ -150,6 +151,7 @@
 
         var stdout = "";
         var process = jake.createExec(command, {printStdout: true, printStderr: true});
+
         process.on("stdout", function (chunk) {
             stdout += chunk;
             //console.log(stdout);
@@ -158,7 +160,6 @@
             fail(errorMessage);
         });
         process.on("cmdEnd", function () {
-            console.log(stdout);
             callback(stdout);
         });
         process.run();
