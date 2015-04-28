@@ -28,7 +28,10 @@
     });
 
     desc("Build and test");
-    task("default", ["lint", "test"]);
+    task("default", ["lint", "test"], function() {
+        console.log("foo");
+        console.log("\n\nOK");
+    }, {async: true});
 
     desc("Start Karma server for testing");
     task("karma", function() {
@@ -49,7 +52,9 @@
     });
 
     desc("Test everything");
-    task("test", ["testNode", "testClient"]);
+    task("test", ["testNode", "testClient"], function() {
+        console.log("tests done");
+    }, {async: true});
 
     desc("Test server code");
     task("testNode", ["nodeVersion"], function () {

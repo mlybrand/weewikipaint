@@ -1,4 +1,4 @@
-/*global describe, it, expect */
+/*global describe, it, expect, dump */
 
 (function() {
     "use strict";
@@ -6,7 +6,10 @@
     describe("Nothing", function() {
 
         it("should run", function() {
-            expect("foo").to.equal("foo");
+            var div = document.createElement("div");
+            div.setAttribute("id", "tdjs");
+            document.body.appendChild(div);
+            dump(document.body);
         });
 
     });
